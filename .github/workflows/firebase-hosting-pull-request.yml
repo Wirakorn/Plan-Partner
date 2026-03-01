@@ -13,9 +13,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install and build API
-        working-directory: plan_partner/api
-        run: npm ci && npm run build
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Build Flutter Web
+        working-directory: plan_partner
+        run: |
+          flutter pub get
+          flutter build web
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
