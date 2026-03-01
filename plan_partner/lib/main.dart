@@ -17,23 +17,20 @@ void main() {
 class InitApp extends StatelessWidget {
   const InitApp({super.key});
 
+  Future<void> _initFirebaseSafely() async {
+    try {
+      await Firebase.initializeApp();
+    } catch (_) {}
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Firebase.initializeApp(),
+      future: _initFirebaseSafely(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const MaterialApp(
             home: Scaffold(body: Center(child: CircularProgressIndicator())),
-          );
-        }
-        if (snapshot.hasError) {
-          return MaterialApp(
-            home: Scaffold(
-              body: Center(
-                child: Text('Firebase init error: ${snapshot.error}'),
-              ),
-            ),
           );
         }
         return const PlanPartnerApp();
