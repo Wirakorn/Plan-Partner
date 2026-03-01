@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'core/providers/task_provider.dart';
 import 'core/providers/user_provider.dart';
-import 'features/dashboard/today_screen.dart';
+import 'features/home/home_screen.dart';
 import 'features/task_entry/task_entry_screen.dart';
 import 'features/review/review_screen.dart';
 import 'features/task_detail/task_detail_screen.dart';
@@ -20,7 +20,7 @@ class PlanPartnerApp extends StatelessWidget {
     final router = GoRouter(
       initialLocation: '/',
       routes: [
-        GoRoute(path: '/', builder: (context, state) => const TodayScreen()),
+        GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
         GoRoute(
           path: '/entry',
           builder: (context, state) => const TaskEntryScreen(),
