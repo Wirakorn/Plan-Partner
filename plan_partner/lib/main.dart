@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'core/providers/task_provider.dart';
@@ -9,7 +10,36 @@ import 'features/review/review_screen.dart';
 import 'features/task_detail/task_detail_screen.dart';
 
 void main() {
-  runApp(const PlanPartnerApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const InitApp());
+}
+
+class InitApp extends StatelessWidget {
+  const InitApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: Firebase.initializeApp(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const MaterialApp(
+            home: Scaffold(body: Center(child: CircularProgressIndicator())),
+          );
+        }
+        if (snapshot.hasError) {
+          return MaterialApp(
+            home: Scaffold(
+              body: Center(
+                child: Text('Firebase init error: ${snapshot.error}'),
+              ),
+            ),
+          );
+        }
+        return const PlanPartnerApp();
+      },
+    );
+  }
 }
 
 class PlanPartnerApp extends StatelessWidget {
