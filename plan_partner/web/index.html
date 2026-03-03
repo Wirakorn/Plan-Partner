@@ -33,7 +33,33 @@
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
+  <div id="app-error" style="display:none;position:fixed;inset:16px;z-index:9999;padding:12px 14px;border-radius:8px;background:#fff4f4;color:#8a1f1f;font-family:Arial,sans-serif;font-size:14px;line-height:1.4;border:1px solid #f0b7b7;"></div>
   <script>
+    function showBootError(message) {
+      var box = document.getElementById('app-error');
+      if (!box) return;
+      box.style.display = 'block';
+      box.textContent = 'App failed to start: ' + message;
+    }
+
+    window.addEventListener('error', function (event) {
+      showBootError(event.message || 'Unknown JavaScript error');
+    });
+
+    window.addEventListener('unhandledrejection', function (event) {
+      var reason = event.reason && event.reason.message
+        ? event.reason.message
+        : String(event.reason || 'Unknown Promise error');
+      showBootError(reason);
+    });
+
+    setTimeout(function () {
+      var started = document.querySelector('flutter-view, flt-glass-pane');
+      if (!started) {
+        showBootError('Initialization timeout. Please hard refresh (Ctrl+F5).');
+      }
+    }, 8000);
+
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistrations().then((registrations) => {
         for (const registration of registrations) {

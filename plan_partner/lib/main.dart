@@ -18,8 +18,13 @@ Future<void> main() async {
   try {
     await Firebase.initializeApp();
   } catch (_) {}
-  final prefs = await SharedPreferences.getInstance();
-  final hasSeenWelcome = prefs.getBool(_seenWelcomeKey) ?? false;
+  bool hasSeenWelcome = false;
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    hasSeenWelcome = prefs.getBool(_seenWelcomeKey) ?? false;
+  } catch (_) {
+    hasSeenWelcome = false;
+  }
   runApp(PlanPartnerApp(hasSeenWelcome: hasSeenWelcome));
 }
 
