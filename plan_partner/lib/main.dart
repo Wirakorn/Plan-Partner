@@ -2,55 +2,54 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'core/providers/task_provider.dart';
 import 'core/providers/user_provider.dart';
 import 'features/home/home_screen.dart';
+import 'features/welcome/welcome_screen.dart';
 import 'features/task_entry/task_entry_screen.dart';
 import 'features/review/review_screen.dart';
 import 'features/task_detail/task_detail_screen.dart';
 
-void main() {
+const _seenWelcomeKey = 'seen_welcome_screen';
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const InitApp());
-}
-
-class InitApp extends StatelessWidget {
-  const InitApp({super.key});
-
-  Future<void> _initFirebaseSafely() async {
-    try {
-      await Firebase.initializeApp();
-    } catch (_) {}
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _initFirebaseSafely(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const MaterialApp(
-            home: Scaffold(body: Center(child: CircularProgressIndicator())),
-          );
-        }
-        return const PlanPartnerApp();
-      },
-    );
-  }
+  try {
+    await Firebase.initializeApp();
+  } catch (_) {}
+  final prefs = await SharedPreferences.getInstance();
+  final hasSeenWelcome = prefs.getBool(_seenWelcomeKey) ?? false;
+  runApp(PlanPartnerApp(hasSeenWelcome: hasSeenWelcome));
 }
 
 class PlanPartnerApp extends StatelessWidget {
-  const PlanPartnerApp({super.key});
+  final bool hasSeenWelcome;
+  const PlanPartnerApp({required this.hasSeenWelcome, super.key});
 
   @override
   Widget build(BuildContext context) {
     final router = GoRouter(
-      initialLocation: '/',
+      initialLocation: hasSeenWelcome ? '/home' : '/welcome',
       routes: [
-        GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
+        GoRoute(
+          path: '/',
+          builder: (context, state) =>
+              hasSeenWelcome ? const HomeScreen() : const WelcomeScreen(),
+        ),
+        GoRoute(
+          path: '/welcome',
+          builder: (context, state) => const WelcomeScreen(),
+        ),
+        GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
         GoRoute(
           path: '/entry',
           builder: (context, state) => const TaskEntryScreen(),
+        ),
+        GoRoute(
+          path: '/entry/:id',
+          builder: (context, state) =>
+              TaskEntryScreen(taskId: state.pathParameters['id']),
         ),
         GoRoute(
           path: '/review',

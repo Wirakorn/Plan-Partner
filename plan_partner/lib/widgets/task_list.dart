@@ -9,7 +9,13 @@ import 'task_card.dart';
 class TaskList extends StatelessWidget {
   final List<Task> tasks;
   final Function(String)? onComplete;
-  const TaskList({required this.tasks, this.onComplete, super.key});
+  final Function(String)? onEdit;
+  const TaskList({
+    required this.tasks,
+    this.onComplete,
+    this.onEdit,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +26,7 @@ class TaskList extends StatelessWidget {
       padding: const EdgeInsets.only(top: 8.0),
       itemCount: tasks.length,
       itemBuilder: (context, index) =>
-          TaskCard(task: tasks[index], onComplete: onComplete),
+          TaskCard(task: tasks[index], onComplete: onComplete, onEdit: onEdit),
     );
   }
 }

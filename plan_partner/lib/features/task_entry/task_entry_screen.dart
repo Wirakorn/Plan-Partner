@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import '../../core/models/task.dart';
 import '../../core/providers/task_provider.dart';
 
 /// Formats a DateTime into a readable date string.
@@ -49,7 +50,8 @@ Future<TimeOfDay?> _pickTime(BuildContext context, TimeOfDay? initial) async {
 }
 
 class TaskEntryScreen extends StatefulWidget {
-  const TaskEntryScreen({super.key});
+  final String? taskId;
+  const TaskEntryScreen({this.taskId, super.key});
 
   @override
   State<TaskEntryScreen> createState() => _TaskEntryScreenState();
@@ -62,6 +64,10 @@ class _TaskEntryScreenState extends State<TaskEntryScreen> {
   DateTime? _dueDate;
   TimeOfDay? _dueTime;
   int _estimatedMinutes = 30; // default 30 minutes
+  TaskPriority _priority = TaskPriority.medium;
+  bool _loadedExisting = false;
+
+  bool get _isEditMode => widget.taskId != null;
 
   @override
   void dispose() {
@@ -72,8 +78,16 @@ class _TaskEntryScreenState extends State<TaskEntryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isEditMode && !_loadedExisting) {
+      final task = context.read<TaskProvider>().getById(widget.taskId!);
+      if (task != null) {
+        _loadFromTask(task);
+      }
+      _loadedExisting = true;
+    }
+
     return Scaffold(
-      appBar: AppBar(title: const Text('New Task')),
+      appBar: AppBar(title: Text(_isEditMode ? 'Edit Task' : 'New Task')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -156,41 +170,102 @@ class _TaskEntryScreenState extends State<TaskEntryScreen> {
                 },
               ),
               const SizedBox(height: 16),
+              DropdownButtonFormField<TaskPriority>(
+                initialValue: _priority,
+                decoration: const InputDecoration(
+                  labelText: 'Priority',
+                  hintText: 'Select task priority',
+                ),
+                items: const [
+                  DropdownMenuItem(
+                    value: TaskPriority.high,
+                    child: Text('High'),
+                  ),
+                  DropdownMenuItem(
+                    value: TaskPriority.medium,
+                    child: Text('Medium'),
+                  ),
+                  DropdownMenuItem(value: TaskPriority.low, child: Text('Low')),
+                ],
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      _priority = value;
+                    });
+                  }
+                },
+              ),
+              const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    DateTime? due;
-                    if (_dueDate != null) {
-                      final dt = _dueDate!;
-                      if (_dueTime != null) {
-                        due = DateTime(
-                          dt.year,
-                          dt.month,
-                          dt.day,
-                          _dueTime!.hour,
-                          _dueTime!.minute,
-                        );
-                      } else {
-                        due = dt;
-                      }
+                    if (!_isEditMode && _dueTime == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Please select due time before saving'),
+                        ),
+                      );
+                      return;
                     }
-                    context.read<TaskProvider>().addTask(
-                      title: _titleCtrl.text,
-                      description: _descCtrl.text.isEmpty
-                          ? null
-                          : _descCtrl.text,
-                      dueDate: due,
-                      estimatedDuration: Duration(minutes: _estimatedMinutes),
-                    );
+
+                    DateTime? due;
+                    if (_dueTime != null) {
+                      final dt = _dueDate ?? DateTime.now();
+                      due = DateTime(
+                        dt.year,
+                        dt.month,
+                        dt.day,
+                        _dueTime!.hour,
+                        _dueTime!.minute,
+                      );
+                    } else if (_dueDate != null) {
+                      due = _dueDate;
+                    }
+                    if (_isEditMode) {
+                      context.read<TaskProvider>().updateTask(
+                        id: widget.taskId!,
+                        title: _titleCtrl.text,
+                        description: _descCtrl.text.isEmpty
+                            ? null
+                            : _descCtrl.text,
+                        dueDate: due,
+                        estimatedDuration: Duration(minutes: _estimatedMinutes),
+                        priority: _priority,
+                      );
+                    } else {
+                      context.read<TaskProvider>().addTask(
+                        title: _titleCtrl.text,
+                        description: _descCtrl.text.isEmpty
+                            ? null
+                            : _descCtrl.text,
+                        dueDate: due,
+                        estimatedDuration: Duration(minutes: _estimatedMinutes),
+                        priority: _priority,
+                      );
+                    }
                     Navigator.of(context).pop();
                   }
                 },
-                child: const Text('Save'),
+                child: Text(_isEditMode ? 'Update' : 'Save'),
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  void _loadFromTask(Task task) {
+    _titleCtrl.text = task.title;
+    _descCtrl.text = task.description ?? '';
+    _dueDate = task.dueDate;
+    if (task.dueDate != null) {
+      _dueTime = TimeOfDay(
+        hour: task.dueDate!.hour,
+        minute: task.dueDate!.minute,
+      );
+    }
+    _estimatedMinutes = task.estimatedDuration?.inMinutes ?? 30;
+    _priority = task.priority;
   }
 }
