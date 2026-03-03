@@ -43,14 +43,20 @@
     }
 
     window.addEventListener('error', function (event) {
-      showBootError(event.message || 'Unknown JavaScript error');
+      var msg = event.message || 'Unknown JavaScript error';
+      var src = event.filename
+        ? ' @ ' + event.filename + ':' + event.lineno + ':' + event.colno
+        : '';
+      var stack = event.error && event.error.stack ? '\n' + event.error.stack : '';
+      showBootError(msg + src + stack);
     });
 
     window.addEventListener('unhandledrejection', function (event) {
       var reason = event.reason && event.reason.message
         ? event.reason.message
         : String(event.reason || 'Unknown Promise error');
-      showBootError(reason);
+      var stack = event.reason && event.reason.stack ? '\n' + event.reason.stack : '';
+      showBootError('Unhandled promise rejection: ' + reason + stack);
     });
 
     setTimeout(function () {

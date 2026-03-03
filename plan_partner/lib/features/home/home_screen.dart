@@ -132,6 +132,21 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final taskProvider = context.watch<TaskProvider>();
     final tasks = taskProvider.tasks;
+    String? renderError;
+
+    List<Task> todayTasks = const [];
+    List<Task> upcomingTasks = const [];
+    List<Task> completedTasks = const [];
+
+    try {
+      todayTasks = _filterToday(tasks);
+      upcomingTasks = _filterUpcoming(tasks);
+      completedTasks = _filterCompleted(tasks);
+    } catch (error, stackTrace) {
+      renderError = error.toString();
+      debugPrint('HomeScreen render error: $error');
+      debugPrint('$stackTrace');
+    }
 
     return DefaultTabController(
       length: 3,
@@ -146,25 +161,35 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
         ),
-        body: TabBarView(
-          children: [
-            TaskList(
-              tasks: _filterToday(tasks),
-              onComplete: (taskId) => taskProvider.toggleComplete(taskId),
-              onEdit: (taskId) => context.push('/entry/$taskId'),
-            ),
-            TaskList(
-              tasks: _filterUpcoming(tasks),
-              onComplete: (taskId) => taskProvider.toggleComplete(taskId),
-              onEdit: (taskId) => context.push('/entry/$taskId'),
-            ),
-            TaskList(
-              tasks: _filterCompleted(tasks),
-              onComplete: (taskId) => taskProvider.toggleComplete(taskId),
-              onEdit: (taskId) => context.push('/entry/$taskId'),
-            ),
-          ],
-        ),
+        body: renderError == null
+            ? TabBarView(
+                children: [
+                  TaskList(
+                    tasks: todayTasks,
+                    onComplete: (taskId) => taskProvider.toggleComplete(taskId),
+                    onEdit: (taskId) => context.push('/entry/$taskId'),
+                  ),
+                  TaskList(
+                    tasks: upcomingTasks,
+                    onComplete: (taskId) => taskProvider.toggleComplete(taskId),
+                    onEdit: (taskId) => context.push('/entry/$taskId'),
+                  ),
+                  TaskList(
+                    tasks: completedTasks,
+                    onComplete: (taskId) => taskProvider.toggleComplete(taskId),
+                    onEdit: (taskId) => context.push('/entry/$taskId'),
+                  ),
+                ],
+              )
+            : Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    'Home failed to render: $renderError',
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
         floatingActionButton: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
