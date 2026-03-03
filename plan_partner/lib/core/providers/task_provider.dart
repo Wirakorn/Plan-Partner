@@ -20,6 +20,12 @@ class TaskProvider extends ChangeNotifier {
   List<Task> get tasks => List.unmodifiable(_tasks);
 
   Future<void> _initialize() async {
+    if (kIsWeb) {
+      _firestore = null;
+      await _loadLocalTasks();
+      return;
+    }
+
     try {
       _firestore = FirebaseFirestore.instance;
       await _listenToFirestore();
@@ -33,22 +39,28 @@ class TaskProvider extends ChangeNotifier {
     final firestore = _firestore;
     if (firestore == null) return;
     try {
-      _sub = firestore.collection('tasks').snapshots().listen((snap) {
-        _tasks.clear();
-        for (final doc in snap.docs) {
-          try {
-            final t = Task.fromJson(doc.data());
-            _tasks.add(t);
-          } catch (_) {}
-        }
-        notifyListeners();
-      }, onError: (_) async {
-        _firestore = null;
-        await _sub?.cancel();
-        _sub = null;
-        await _loadLocalTasks();
-        notifyListeners();
-      });
+      _sub = firestore
+          .collection('tasks')
+          .snapshots()
+          .listen(
+            (snap) {
+              _tasks.clear();
+              for (final doc in snap.docs) {
+                try {
+                  final t = Task.fromJson(doc.data());
+                  _tasks.add(t);
+                } catch (_) {}
+              }
+              notifyListeners();
+            },
+            onError: (_) async {
+              _firestore = null;
+              await _sub?.cancel();
+              _sub = null;
+              await _loadLocalTasks();
+              notifyListeners();
+            },
+          );
     } catch (_) {
       _firestore = null;
       await _loadLocalTasks();

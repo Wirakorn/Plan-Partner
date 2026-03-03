@@ -6,4 +6,11 @@ _flutter.loader.load({
     useLocalCanvasKit: true,
     renderer: "canvaskit",
   },
+}).catch((error) => {
+  const details = error && error.stack ? `${error}\n${error.stack}` : String(error);
+  if (typeof window.showBootError === 'function') {
+    window.showBootError(`Loader failed: ${details}`);
+  } else {
+    console.error('Loader failed:', error);
+  }
 });
