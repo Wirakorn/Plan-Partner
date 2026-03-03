@@ -42,6 +42,12 @@ class TaskProvider extends ChangeNotifier {
           } catch (_) {}
         }
         notifyListeners();
+      }, onError: (_) async {
+        _firestore = null;
+        await _sub?.cancel();
+        _sub = null;
+        await _loadLocalTasks();
+        notifyListeners();
       });
     } catch (_) {
       _firestore = null;
