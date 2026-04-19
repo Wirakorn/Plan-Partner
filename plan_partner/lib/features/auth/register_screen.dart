@@ -7,6 +7,7 @@ const _isLoggedInKey = 'is_logged_in';
 const _savedEmailKey = 'auth_email';
 const _savedUsernameKey = 'auth_username';
 const _savedPasswordKey = 'auth_password';
+const _localTasksKey = 'plan_partner_tasks';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -42,6 +43,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       await prefs.setString(_savedUsernameKey, _usernameController.text.trim());
       await prefs.setString(_savedPasswordKey, _passwordController.text);
       await prefs.setBool(_isLoggedInKey, true);
+
+      // Clear old task cache on new registration
+      await prefs.remove(_localTasksKey);
 
       if (!mounted) return;
       ScaffoldMessenger.of(
