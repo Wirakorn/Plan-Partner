@@ -12,10 +12,10 @@ import 'package:plan_partner/main.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build the app and trigger a frame.
-    await tester.pumpWidget(const PlanPartnerApp());
+    await tester.pumpWidget(const PlanPartnerApp(isLoggedIn: false));
+    await tester.pumpAndSettle();
 
-    // Verify the app builds and shows a Scaffold.
     expect(find.byType(Scaffold), findsWidgets);
+    expect(find.text('Welcome Back'), findsOneWidget);
   });
 }

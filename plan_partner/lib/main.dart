@@ -5,46 +5,53 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/providers/task_provider.dart';
 import 'core/providers/user_provider.dart';
+import 'features/auth/login_screen.dart';
+import 'features/auth/register_screen.dart';
+import 'features/chat/chat_screen.dart';
 import 'features/home/home_screen.dart';
-import 'features/welcome/welcome_screen.dart';
+import 'features/settings/settings_screen.dart';
 import 'features/task_entry/task_entry_screen.dart';
 import 'features/review/review_screen.dart';
 import 'features/task_detail/task_detail_screen.dart';
 
-const _seenWelcomeKey = 'seen_welcome_screen';
+const _isLoggedInKey = 'is_logged_in';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
     await Firebase.initializeApp();
   } catch (_) {}
-  bool hasSeenWelcome = false;
+  bool isLoggedIn = false;
   try {
     final prefs = await SharedPreferences.getInstance();
-    hasSeenWelcome = prefs.getBool(_seenWelcomeKey) ?? false;
+    isLoggedIn = prefs.getBool(_isLoggedInKey) ?? false;
   } catch (_) {
-    hasSeenWelcome = false;
+    isLoggedIn = false;
   }
-  runApp(PlanPartnerApp(hasSeenWelcome: hasSeenWelcome));
+  runApp(PlanPartnerApp(isLoggedIn: isLoggedIn));
 }
 
 class PlanPartnerApp extends StatelessWidget {
-  final bool hasSeenWelcome;
-  const PlanPartnerApp({required this.hasSeenWelcome, super.key});
+  final bool isLoggedIn;
+  const PlanPartnerApp({required this.isLoggedIn, super.key});
 
   @override
   Widget build(BuildContext context) {
     final router = GoRouter(
-      initialLocation: hasSeenWelcome ? '/home' : '/welcome',
+      initialLocation: isLoggedIn ? '/home' : '/login',
       routes: [
         GoRoute(
           path: '/',
           builder: (context, state) =>
-              hasSeenWelcome ? const HomeScreen() : const WelcomeScreen(),
+              isLoggedIn ? const HomeScreen() : const LoginScreen(),
         ),
         GoRoute(
-          path: '/welcome',
-          builder: (context, state) => const WelcomeScreen(),
+          path: '/login',
+          builder: (context, state) => const LoginScreen(),
+        ),
+        GoRoute(
+          path: '/register',
+          builder: (context, state) => const RegisterScreen(),
         ),
         GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
         GoRoute(
@@ -65,6 +72,11 @@ class PlanPartnerApp extends StatelessWidget {
           builder: (context, state) =>
               TaskDetailScreen(id: state.pathParameters['id']!),
         ),
+        GoRoute(
+          path: '/settings',
+          builder: (context, state) => const SettingsScreen(),
+        ),
+        GoRoute(path: '/chat', builder: (context, state) => const ChatScreen()),
       ],
     );
 
@@ -81,13 +93,61 @@ class PlanPartnerApp extends StatelessWidget {
             seedColor: const Color(0xFF4DB8A8),
             brightness: Brightness.light,
           ),
+          scaffoldBackgroundColor: const Color(0xFFF7FBFA),
+          cardTheme: CardThemeData(
+            elevation: 2,
+            shadowColor: const Color(0xFF286B63).withValues(alpha: 0.05),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
+            color: Colors.white,
+          ),
+          inputDecorationTheme: InputDecorationTheme(
+            filled: true,
+            fillColor: Colors.white,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 12,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide(color: const Color(0xFFBCE2DC)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide(color: const Color(0xFFBCE2DC)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide(
+                color: const Color(0xFF2F9C90),
+                width: 1.4,
+              ),
+            ),
+          ),
+          filledButtonTheme: FilledButtonThemeData(
+            style: FilledButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 13),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
+          ),
+          outlinedButtonTheme: OutlinedButtonThemeData(
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 13),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
+          ),
           appBarTheme: AppBarTheme(
-            backgroundColor: const Color(0xFF4DB8A8),
+            backgroundColor: const Color(0xFF2E8F84),
             foregroundColor: Colors.white,
             elevation: 0,
           ),
           floatingActionButtonTheme: FloatingActionButtonThemeData(
-            backgroundColor: const Color(0xFF4DB8A8),
+            backgroundColor: const Color(0xFF2E8F84),
             foregroundColor: Colors.white,
           ),
         ),

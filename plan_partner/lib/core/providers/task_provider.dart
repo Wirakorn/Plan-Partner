@@ -95,6 +95,37 @@ class TaskProvider extends ChangeNotifier {
     } catch (_) {}
   }
 
+  Future<void> clearAllTasks() async {
+    _tasks.clear();
+    try {
+      if (_firestore != null) {
+        final snapshot = await _firestore!.collection('tasks').get();
+        final batch = _firestore!.batch();
+        for (final doc in snapshot.docs) {
+          batch.delete(doc.reference);
+        }
+        await batch.commit();
+      }
+    } catch (_) {}
+    await _saveLocalTasks();
+    notifyListeners();
+  }
+
+  Future<void> deleteTask(String id) async {
+    try {
+      if (_firestore == null) throw Exception('Firestore not initialized');
+      await _firestore!.collection('tasks').doc(id).delete();
+      return;
+    } catch (_) {}
+
+    final before = _tasks.length;
+    _tasks.removeWhere((task) => task.id == id);
+    if (_tasks.length == before) return;
+
+    await _saveLocalTasks();
+    notifyListeners();
+  }
+
   Future<void> addTask({
     required String title,
     String? description,

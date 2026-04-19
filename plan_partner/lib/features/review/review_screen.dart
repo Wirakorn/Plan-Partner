@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../widgets/brand_app_icon.dart';
 import 'package:provider/provider.dart';
 import '../../core/providers/task_provider.dart';
 import '../../core/models/task.dart';
@@ -33,21 +34,51 @@ class ReviewScreen extends StatelessWidget {
     final tasks = context.watch<TaskProvider>().tasks;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('AI-Suggested Schedule'), elevation: 0),
+      appBar: AppBar(
+        title: Row(
+          children: const [
+            BrandAppIcon(size: 28, elevated: false),
+            SizedBox(width: 10),
+            Text('AI-Suggested Schedule'),
+          ],
+        ),
+        elevation: 0,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFF4DB8A8).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                'Review and confirm your optimized plan',
-                style: Theme.of(context).textTheme.bodyMedium,
+            Card(
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFF6FBFA), Color(0xFFEFF8F6)],
+                  ),
+                  borderRadius: BorderRadius.circular(22),
+                ),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: const Color(0xFF4DB8A8),
+                      child: Icon(
+                        Icons.auto_awesome_rounded,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Review and confirm your optimized plan',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -81,8 +112,16 @@ class ReviewScreen extends StatelessWidget {
                     margin: const EdgeInsets.only(bottom: 12),
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey[300]!),
-                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.white,
+                      border: Border.all(color: Colors.grey[200]!),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.04),
+                          blurRadius: 12,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
                     ),
                     child: Row(
                       children: [
@@ -156,7 +195,7 @@ class ReviewScreen extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4DB8A8),
+                    backgroundColor: const Color(0xFF2E8F84),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 24,
                       vertical: 12,
