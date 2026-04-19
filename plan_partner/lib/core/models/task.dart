@@ -53,19 +53,30 @@ class Task {
     this.isCompleted = false,
   });
 
-  factory Task.fromJson(Map<String, dynamic> json) => Task(
-    id: json['id'] as String,
-    title: json['title'] as String,
-    description: json['description'] as String?,
-    dueDate: json['dueDate'] == null
-        ? null
-        : DateTime.parse(json['dueDate'] as String),
-    estimatedDuration: json['estimatedDuration'] == null
-        ? null
-        : Duration(minutes: json['estimatedDuration'] as int),
-    priority: taskPriorityFromString(json['priority'] as String?),
-    isCompleted: json['isCompleted'] as bool? ?? false,
-  );
+  factory Task.fromJson(Map<String, dynamic> json) {
+    final id = json['id'] as String?;
+    final title = json['title'] as String?;
+
+    if (id == null || id.isEmpty || title == null || title.isEmpty) {
+      throw FormatException('Task requires id and title fields');
+    }
+
+    return Task(
+      id: id,
+      title: title,
+      description: json['description'] as String?,
+      dueDate: json['dueDate'] == null
+          ? null
+          : DateTime.tryParse(json['dueDate'] as String? ?? ''),
+      estimatedDuration: json['estimatedDuration'] == null
+          ? null
+          : Duration(
+              minutes: (json['estimatedDuration'] as num?)?.toInt() ?? 0,
+            ),
+      priority: taskPriorityFromString(json['priority'] as String?),
+      isCompleted: json['isCompleted'] as bool? ?? false,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     'id': id,

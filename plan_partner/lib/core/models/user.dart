@@ -4,8 +4,11 @@ class User {
 
   User({required this.id, required this.name});
 
-  factory User.fromJson(Map<String, dynamic> json) =>
-      User(id: json['id'] as String, name: json['name'] as String);
+  factory User.fromJson(Map<String, dynamic> json) {
+    final id = json['id'] as String? ?? '';
+    final name = json['name'] as String? ?? 'Planner';
+    return User(id: id.isEmpty ? 'default-user' : id, name: name);
+  }
 
   Map<String, dynamic> toJson() => {'id': id, 'name': name};
 }
