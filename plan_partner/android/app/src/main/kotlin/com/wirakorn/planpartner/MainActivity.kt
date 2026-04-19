@@ -1,4 +1,4 @@
-package com.example.plan_partner
+package com.wirakorn.planpartner
 
 import io.flutter.embedding.android.FlutterActivity
 

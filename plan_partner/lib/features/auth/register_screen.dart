@@ -23,6 +23,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   bool _isSubmitting = false;
+  bool _hasAcceptedPrivacy = false;
 
   @override
   void dispose() {
@@ -35,6 +36,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
+
+    if (!_hasAcceptedPrivacy) {
+      final accepted = await _showPrivacyConsentPopup();
+      if (accepted != true || !mounted) return;
+      setState(() => _hasAcceptedPrivacy = true);
+    }
 
     setState(() => _isSubmitting = true);
     try {
@@ -57,6 +64,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
         setState(() => _isSubmitting = false);
       }
     }
+  }
+
+  Future<bool?> _showPrivacyConsentPopup() {
+    return showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Privacy Policy Consent'),
+          content: const SingleChildScrollView(
+            child: Text(
+              'By creating an account, you agree that Plan Partner stores your account details and task data to provide app features. You can review, export, and delete your local data from Settings at any time.',
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(false);
+                context.push('/privacy');
+              },
+              child: const Text('View Full Policy'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('Accept'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -213,6 +253,40 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 },
                               ),
                               const SizedBox(height: 20),
+                              Row(
+                                children: [
+                                  Checkbox(
+                                    value: _hasAcceptedPrivacy,
+                                    onChanged: (value) {
+                                      setState(
+                                        () => _hasAcceptedPrivacy =
+                                            value ?? false,
+                                      );
+                                    },
+                                  ),
+                                  Expanded(
+                                    child: Wrap(
+                                      crossAxisAlignment:
+                                          WrapCrossAlignment.center,
+                                      children: [
+                                        const Text('I agree to the '),
+                                        TextButton(
+                                          onPressed: () =>
+                                              context.push('/privacy'),
+                                          child: const Text('Privacy Policy'),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              OutlinedButton.icon(
+                                onPressed: () => context.push('/privacy'),
+                                icon: const Icon(Icons.privacy_tip_outlined),
+                                label: const Text('Open Privacy Policy'),
+                              ),
+                              const SizedBox(height: 12),
                               FilledButton.icon(
                                 onPressed: _isSubmitting ? null : _register,
                                 icon: const Icon(

@@ -200,6 +200,18 @@ class SettingsScreen extends StatelessWidget {
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size.fromHeight(48),
                       ),
+                      onPressed: () => context.push('/privacy'),
+                      icon: const Icon(Icons.privacy_tip_outlined),
+                      label: const Text('Open privacy policy'),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(48),
+                      ),
                       onPressed: () => _copyExportData(context),
                       icon: const Icon(Icons.copy_outlined),
                       label: const Text('Copy my data'),

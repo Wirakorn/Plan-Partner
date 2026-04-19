@@ -9,6 +9,7 @@ import 'features/auth/login_screen.dart';
 import 'features/auth/register_screen.dart';
 import 'features/chat/chat_screen.dart';
 import 'features/home/home_screen.dart';
+import 'features/privacy/privacy_policy_screen.dart';
 import 'features/settings/settings_screen.dart';
 import 'features/task_entry/task_entry_screen.dart';
 import 'features/review/review_screen.dart';
@@ -52,6 +53,10 @@ class PlanPartnerApp extends StatelessWidget {
         GoRoute(
           path: '/register',
           builder: (context, state) => const RegisterScreen(),
+        ),
+        GoRoute(
+          path: '/privacy',
+          builder: (context, state) => const PrivacyPolicyScreen(),
         ),
         GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
         GoRoute(
