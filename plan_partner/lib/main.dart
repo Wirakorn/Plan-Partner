@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'core/providers/task_provider.dart';
 import 'core/providers/user_provider.dart';
 import 'features/auth/login_screen.dart';
@@ -16,39 +16,63 @@ import 'features/task_entry/task_entry_screen.dart';
 import 'features/review/review_screen.dart';
 import 'features/task_detail/task_detail_screen.dart';
 
-const _isLoggedInKey = 'is_logged_in';
+class _AuthStateNotifier extends ChangeNotifier {
+  _AuthStateNotifier() {
+    fb_auth.FirebaseAuth.instance.authStateChanges().listen((user) {
+      notifyListeners();
+    });
+  }
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
     await Firebase.initializeApp();
   } catch (_) {}
-  bool isLoggedIn = false;
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    isLoggedIn = prefs.getBool(_isLoggedInKey) ?? false;
-  } catch (_) {
-    isLoggedIn = false;
-  }
-  runApp(PlanPartnerApp(isLoggedIn: isLoggedIn));
+  runApp(const PlanPartnerApp());
 }
 
-class PlanPartnerApp extends StatelessWidget {
-  final bool isLoggedIn;
-  const PlanPartnerApp({required this.isLoggedIn, super.key});
+class PlanPartnerApp extends StatefulWidget {
+  const PlanPartnerApp({super.key});
 
+  @override
+  State<PlanPartnerApp> createState() => _PlanPartnerAppState();
+}
+
+class _PlanPartnerAppState extends State<PlanPartnerApp> {
   @override
   Widget build(BuildContext context) {
     final router = GoRouter(
       initialLocation: '/landing',
+      refreshListenable: _AuthStateNotifier(),
+      redirect: (context, state) {
+        final user = fb_auth.FirebaseAuth.instance.currentUser;
+        final isLoggingIn =
+            state.matchedLocation == '/login' ||
+            state.matchedLocation == '/register' ||
+            state.matchedLocation == '/landing' ||
+            state.matchedLocation == '/privacy';
+
+        // If not logged in and trying to access protected routes, go to login
+        if (user == null && !isLoggingIn) {
+          return '/login';
+        }
+
+        // If logged in and on landing, go to home
+        if (user != null && state.matchedLocation == '/landing') {
+          return '/home';
+        }
+
+        return null;
+      },
       routes: [
         GoRoute(
           path: '/',
-          builder: (context, state) => LandingScreen(isLoggedIn: isLoggedIn),
+          builder: (context, state) => const LandingScreen(isLoggedIn: false),
         ),
         GoRoute(
           path: '/landing',
-          builder: (context, state) => LandingScreen(isLoggedIn: isLoggedIn),
+          builder: (context, state) => const LandingScreen(isLoggedIn: false),
         ),
         GoRoute(
           path: '/login',
