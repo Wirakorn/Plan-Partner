@@ -111,6 +111,18 @@ class _PlanPartnerAppState extends State<PlanPartnerApp> {
         ),
         GoRoute(path: '/chat', builder: (context, state) => const ChatScreen()),
       ],
+      errorBuilder: (context, state) => Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error, size: 48, color: Colors.red),
+              const SizedBox(height: 16),
+              Text('Page not found: ${state.matchedLocation}'),
+            ],
+          ),
+        ),
+      ),
     );
 
     return MultiProvider(
