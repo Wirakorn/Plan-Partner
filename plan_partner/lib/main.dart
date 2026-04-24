@@ -8,6 +8,7 @@ import 'core/providers/user_provider.dart';
 import 'features/auth/login_screen.dart';
 import 'features/auth/register_screen.dart';
 import 'features/chat/chat_screen.dart';
+import 'features/landing/landing_screen.dart';
 import 'features/home/home_screen.dart';
 import 'features/privacy/privacy_policy_screen.dart';
 import 'features/settings/settings_screen.dart';
@@ -39,12 +40,15 @@ class PlanPartnerApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final router = GoRouter(
-      initialLocation: isLoggedIn ? '/home' : '/login',
+      initialLocation: '/landing',
       routes: [
         GoRoute(
           path: '/',
-          builder: (context, state) =>
-              isLoggedIn ? const HomeScreen() : const LoginScreen(),
+          builder: (context, state) => LandingScreen(isLoggedIn: isLoggedIn),
+        ),
+        GoRoute(
+          path: '/landing',
+          builder: (context, state) => LandingScreen(isLoggedIn: isLoggedIn),
         ),
         GoRoute(
           path: '/login',

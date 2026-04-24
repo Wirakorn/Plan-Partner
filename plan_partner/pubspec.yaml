@@ -75,6 +75,10 @@ flutter:
 
   assets:
     - assets/images/app_icon.png
+    - assets/images/icon_2.png
+    - assets/images/preview_1.jpg
+    - assets/images/preview_2.jpg
+    - assets/images/preview_3.jpg
 
   # To add assets to your application, add an assets section, like this:
   # assets:
