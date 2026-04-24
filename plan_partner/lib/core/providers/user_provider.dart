@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import '../models/user.dart';
 
 class UserProvider extends ChangeNotifier {
@@ -10,8 +11,11 @@ class UserProvider extends ChangeNotifier {
   static const String _savedUsernameKey = 'auth_username';
   final _uuid = const Uuid();
   User? _user;
+  final fb_auth.FirebaseAuth _auth = fb_auth.FirebaseAuth.instance;
 
   User? get user => _user;
+  String? get firebaseUid => _auth.currentUser?.uid;
+  bool get isAuthenticated => _auth.currentUser != null;
 
   UserProvider() {
     _user = User(id: _uuid.v4(), name: 'Planner');
@@ -74,5 +78,54 @@ class UserProvider extends ChangeNotifier {
     _user = User(id: _uuid.v4(), name: 'Planner');
     await _saveUser();
     notifyListeners();
+  }
+
+  /// Sign in with email and password
+  Future<void> signInWithEmail(String email, String password) async {
+    try {
+      final cred = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      if (cred.user != null) {
+        _user = User(id: cred.user!.uid, name: cred.user!.email ?? 'User');
+        await _saveUser();
+        notifyListeners();
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Sign up with email and password
+  Future<void> signUpWithEmail(
+    String email,
+    String password,
+    String name,
+  ) async {
+    try {
+      final cred = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      if (cred.user != null) {
+        _user = User(id: cred.user!.uid, name: name);
+        await _saveUser();
+        notifyListeners();
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Sign out
+  Future<void> signOut() async {
+    try {
+      await _auth.signOut();
+      _user = null;
+      notifyListeners();
+    } catch (e) {
+      rethrow;
+    }
   }
 }

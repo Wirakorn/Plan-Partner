@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import '../../core/providers/user_provider.dart';
 import '../../widgets/brand_app_icon.dart';
 
 const _isLoggedInKey = 'is_logged_in';
-const _savedEmailKey = 'auth_email';
-const _savedUsernameKey = 'auth_username';
-const _savedPasswordKey = 'auth_password';
 const _localTasksKey = 'plan_partner_tasks';
 
 class RegisterScreen extends StatefulWidget {
@@ -45,13 +44,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     setState(() => _isSubmitting = true);
     try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_savedEmailKey, _emailController.text.trim());
-      await prefs.setString(_savedUsernameKey, _usernameController.text.trim());
-      await prefs.setString(_savedPasswordKey, _passwordController.text);
-      await prefs.setBool(_isLoggedInKey, true);
+      final userProvider = context.read<UserProvider>();
+      await userProvider.signUpWithEmail(
+        _emailController.text.trim(),
+        _passwordController.text,
+        _usernameController.text.trim(),
+      );
 
-      // Clear old task cache on new registration
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_isLoggedInKey, true);
       await prefs.remove(_localTasksKey);
 
       if (!mounted) return;
@@ -59,6 +60,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
         context,
       ).showSnackBar(const SnackBar(content: Text('Registration successful')));
       context.go('/home');
+    } catch (e) {
+      if (!mounted) return;
+      String errorMessage = 'Registration failed';
+      if (e.toString().contains('email-already-in-use')) {
+        errorMessage = 'Email already in use';
+      } else if (e.toString().contains('weak-password')) {
+        errorMessage = 'Password is too weak';
+      } else if (e.toString().contains('invalid-email')) {
+        errorMessage = 'Invalid email';
+      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(errorMessage)));
     } finally {
       if (mounted) {
         setState(() => _isSubmitting = false);

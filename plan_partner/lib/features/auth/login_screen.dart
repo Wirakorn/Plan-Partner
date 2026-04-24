@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import '../../core/providers/user_provider.dart';
 import '../../widgets/brand_app_icon.dart';
 
 const _isLoggedInKey = 'is_logged_in';
-const _savedEmailKey = 'auth_email';
-const _savedPasswordKey = 'auth_password';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -32,24 +32,30 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isSubmitting = true);
     try {
+      final userProvider = context.read<UserProvider>();
+      await userProvider.signInWithEmail(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
+
       final prefs = await SharedPreferences.getInstance();
-      final savedEmail = prefs.getString(_savedEmailKey);
-      final savedPassword = prefs.getString(_savedPasswordKey);
-
-      final email = _emailController.text.trim();
-      final password = _passwordController.text;
-
-      if (savedEmail == email && savedPassword == password) {
-        await prefs.setBool(_isLoggedInKey, true);
-        if (!mounted) return;
-        context.go('/home');
-        return;
-      }
+      await prefs.setBool(_isLoggedInKey, true);
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid email or password')),
-      );
+      context.go('/home');
+    } catch (e) {
+      if (!mounted) return;
+      String errorMessage = 'Login failed';
+      if (e.toString().contains('user-not-found')) {
+        errorMessage = 'User not found';
+      } else if (e.toString().contains('wrong-password')) {
+        errorMessage = 'Wrong password';
+      } else if (e.toString().contains('invalid-email')) {
+        errorMessage = 'Invalid email';
+      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(errorMessage)));
     } finally {
       if (mounted) {
         setState(() => _isSubmitting = false);

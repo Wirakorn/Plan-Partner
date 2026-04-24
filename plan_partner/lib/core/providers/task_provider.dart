@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/task.dart';
 
@@ -11,6 +12,7 @@ class TaskProvider extends ChangeNotifier {
   final _uuid = const Uuid();
   static const String _localTasksKey = 'plan_partner_tasks';
   FirebaseFirestore? _firestore;
+  final fb_auth.FirebaseAuth _auth = fb_auth.FirebaseAuth.instance;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _sub;
 
   TaskProvider() {
@@ -38,8 +40,18 @@ class TaskProvider extends ChangeNotifier {
   Future<void> _listenToFirestore() async {
     final firestore = _firestore;
     if (firestore == null) return;
+
+    final currentUser = _auth.currentUser;
+    if (currentUser == null) {
+      await _loadLocalTasks();
+      notifyListeners();
+      return;
+    }
+
     try {
       _sub = firestore
+          .collection('users')
+          .doc(currentUser.uid)
           .collection('tasks')
           .snapshots()
           .listen(
@@ -49,11 +61,14 @@ class TaskProvider extends ChangeNotifier {
                 try {
                   final t = Task.fromJson(doc.data());
                   _tasks.add(t);
-                } catch (_) {}
+                } catch (e) {
+                  print('Error parsing task: $e');
+                }
               }
               notifyListeners();
             },
-            onError: (_) async {
+            onError: (error) async {
+              print('Firestore error: $error');
               _firestore = null;
               await _sub?.cancel();
               _sub = null;
@@ -61,7 +76,8 @@ class TaskProvider extends ChangeNotifier {
               notifyListeners();
             },
           );
-    } catch (_) {
+    } catch (e) {
+      print('Error setting up Firestore listener: $e');
       _firestore = null;
       await _loadLocalTasks();
     }
@@ -99,14 +115,23 @@ class TaskProvider extends ChangeNotifier {
     _tasks.clear();
     try {
       if (_firestore != null) {
-        final snapshot = await _firestore!.collection('tasks').get();
-        final batch = _firestore!.batch();
-        for (final doc in snapshot.docs) {
-          batch.delete(doc.reference);
+        final currentUser = _auth.currentUser;
+        if (currentUser != null) {
+          final snapshot = await _firestore!
+              .collection('users')
+              .doc(currentUser.uid)
+              .collection('tasks')
+              .get();
+          final batch = _firestore!.batch();
+          for (final doc in snapshot.docs) {
+            batch.delete(doc.reference);
+          }
+          await batch.commit();
         }
-        await batch.commit();
       }
-    } catch (_) {}
+    } catch (e) {
+      print('Error clearing tasks: $e');
+    }
     await _saveLocalTasks();
     notifyListeners();
   }
@@ -114,9 +139,19 @@ class TaskProvider extends ChangeNotifier {
   Future<void> deleteTask(String id) async {
     try {
       if (_firestore == null) throw Exception('Firestore not initialized');
-      await _firestore!.collection('tasks').doc(id).delete();
+      final currentUser = _auth.currentUser;
+      if (currentUser == null) throw Exception('No authenticated user');
+
+      await _firestore!
+          .collection('users')
+          .doc(currentUser.uid)
+          .collection('tasks')
+          .doc(id)
+          .delete();
       return;
-    } catch (_) {}
+    } catch (e) {
+      print('Error deleting task to Firestore: $e');
+    }
 
     final before = _tasks.length;
     _tasks.removeWhere((task) => task.id == id);
@@ -145,8 +180,18 @@ class TaskProvider extends ChangeNotifier {
     // Try writing to Firestore; if unavailable, fall back to in-memory
     try {
       if (_firestore == null) throw Exception('Firestore not initialized');
-      await _firestore!.collection('tasks').doc(task.id).set(task.toJson());
-    } catch (_) {
+      final currentUser = _auth.currentUser;
+      if (currentUser == null) throw Exception('No authenticated user');
+
+      await _firestore!
+          .collection('users')
+          .doc(currentUser.uid)
+          .collection('tasks')
+          .doc(task.id)
+          .set(task.toJson());
+      print('Task saved to Firestore: ${task.id}');
+    } catch (e) {
+      print('Error saving task to Firestore: $e');
       _tasks.add(task);
       await _saveLocalTasks();
       notifyListeners();
@@ -180,14 +225,23 @@ class TaskProvider extends ChangeNotifier {
 
     try {
       if (_firestore == null) throw Exception('Firestore not initialized');
-      await _firestore!.collection('tasks').doc(existing.id).update({
-        'title': existing.title,
-        'description': existing.description,
-        'dueDate': existing.dueDate?.toIso8601String(),
-        'estimatedDuration': existing.estimatedDuration?.inMinutes,
-        'priority': taskPriorityToString(existing.priority),
-      });
-    } catch (_) {
+      final currentUser = _auth.currentUser;
+      if (currentUser == null) throw Exception('No authenticated user');
+
+      await _firestore!
+          .collection('users')
+          .doc(currentUser.uid)
+          .collection('tasks')
+          .doc(existing.id)
+          .update({
+            'title': existing.title,
+            'description': existing.description,
+            'dueDate': existing.dueDate?.toIso8601String(),
+            'estimatedDuration': existing.estimatedDuration?.inMinutes,
+            'priority': taskPriorityToString(existing.priority),
+          });
+    } catch (e) {
+      print('Error updating task: $e');
       await _saveLocalTasks();
       notifyListeners();
     }
@@ -201,10 +255,17 @@ class TaskProvider extends ChangeNotifier {
       // persist change
       try {
         if (_firestore == null) throw Exception('Firestore not initialized');
-        await _firestore!.collection('tasks').doc(t.id).update({
-          'isCompleted': t.isCompleted,
-        });
-      } catch (_) {
+        final currentUser = _auth.currentUser;
+        if (currentUser == null) throw Exception('No authenticated user');
+
+        await _firestore!
+            .collection('users')
+            .doc(currentUser.uid)
+            .collection('tasks')
+            .doc(t.id)
+            .update({'isCompleted': t.isCompleted});
+      } catch (e) {
+        print('Error toggling task completion: $e');
         await _saveLocalTasks();
         notifyListeners();
       }
