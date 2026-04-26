@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -16,19 +19,45 @@ import 'features/task_entry/task_entry_screen.dart';
 import 'features/review/review_screen.dart';
 import 'features/task_detail/task_detail_screen.dart';
 
+const FirebaseOptions _webFirebaseOptions = FirebaseOptions(
+  apiKey: 'AIzaSyACK_e2EThvDu3GZbV1J1gfNv-OO1I05vA',
+  appId: '1:159461611222:web:e09a9c14cf2a5001905b77',
+  messagingSenderId: '159461611222',
+  projectId: 'plan-partner-000',
+  authDomain: 'plan-partner-000.firebaseapp.com',
+  storageBucket: 'plan-partner-000.firebasestorage.app',
+  measurementId: 'G-2J8MC8RHV9',
+);
+
 class _AuthStateNotifier extends ChangeNotifier {
+  StreamSubscription<fb_auth.User?>? _sub;
+
   _AuthStateNotifier() {
-    fb_auth.FirebaseAuth.instance.authStateChanges().listen((user) {
-      notifyListeners();
-    });
+    try {
+      _sub = fb_auth.FirebaseAuth.instance.authStateChanges().listen((_) {
+        notifyListeners();
+      });
+    } catch (_) {}
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
   }
 }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
-    await Firebase.initializeApp();
-  } catch (_) {}
+    if (kIsWeb) {
+      await Firebase.initializeApp(options: _webFirebaseOptions);
+    } else {
+      await Firebase.initializeApp();
+    }
+  } catch (e) {
+    debugPrint('Firebase init failed: $e');
+  }
   runApp(const PlanPartnerApp());
 }
 
@@ -46,7 +75,12 @@ class _PlanPartnerAppState extends State<PlanPartnerApp> {
       initialLocation: '/landing',
       refreshListenable: _AuthStateNotifier(),
       redirect: (context, state) {
-        final user = fb_auth.FirebaseAuth.instance.currentUser;
+        fb_auth.User? user;
+        try {
+          user = fb_auth.FirebaseAuth.instance.currentUser;
+        } catch (_) {
+          user = null;
+        }
         final isLoggingIn =
             state.matchedLocation == '/login' ||
             state.matchedLocation == '/register' ||

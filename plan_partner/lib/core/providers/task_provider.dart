@@ -12,8 +12,15 @@ class TaskProvider extends ChangeNotifier {
   final _uuid = const Uuid();
   static const String _localTasksKey = 'plan_partner_tasks';
   FirebaseFirestore? _firestore;
-  final fb_auth.FirebaseAuth _auth = fb_auth.FirebaseAuth.instance;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _sub;
+
+  fb_auth.FirebaseAuth? get _auth {
+    try {
+      return fb_auth.FirebaseAuth.instance;
+    } catch (_) {
+      return null;
+    }
+  }
 
   TaskProvider() {
     _initialize();
@@ -22,12 +29,6 @@ class TaskProvider extends ChangeNotifier {
   List<Task> get tasks => List.unmodifiable(_tasks);
 
   Future<void> _initialize() async {
-    if (kIsWeb) {
-      _firestore = null;
-      await _loadLocalTasks();
-      return;
-    }
-
     try {
       _firestore = FirebaseFirestore.instance;
       await _listenToFirestore();
@@ -41,7 +42,7 @@ class TaskProvider extends ChangeNotifier {
     final firestore = _firestore;
     if (firestore == null) return;
 
-    final currentUser = _auth.currentUser;
+    final currentUser = _auth?.currentUser;
     if (currentUser == null) {
       await _loadLocalTasks();
       notifyListeners();
@@ -115,7 +116,7 @@ class TaskProvider extends ChangeNotifier {
     _tasks.clear();
     try {
       if (_firestore != null) {
-        final currentUser = _auth.currentUser;
+        final currentUser = _auth?.currentUser;
         if (currentUser != null) {
           final snapshot = await _firestore!
               .collection('users')
@@ -139,7 +140,7 @@ class TaskProvider extends ChangeNotifier {
   Future<void> deleteTask(String id) async {
     try {
       if (_firestore == null) throw Exception('Firestore not initialized');
-      final currentUser = _auth.currentUser;
+      final currentUser = _auth?.currentUser;
       if (currentUser == null) throw Exception('No authenticated user');
 
       await _firestore!
@@ -180,7 +181,7 @@ class TaskProvider extends ChangeNotifier {
     // Try writing to Firestore; if unavailable, fall back to in-memory
     try {
       if (_firestore == null) throw Exception('Firestore not initialized');
-      final currentUser = _auth.currentUser;
+      final currentUser = _auth?.currentUser;
       if (currentUser == null) throw Exception('No authenticated user');
 
       await _firestore!
@@ -225,7 +226,7 @@ class TaskProvider extends ChangeNotifier {
 
     try {
       if (_firestore == null) throw Exception('Firestore not initialized');
-      final currentUser = _auth.currentUser;
+      final currentUser = _auth?.currentUser;
       if (currentUser == null) throw Exception('No authenticated user');
 
       await _firestore!
@@ -255,7 +256,7 @@ class TaskProvider extends ChangeNotifier {
       // persist change
       try {
         if (_firestore == null) throw Exception('Firestore not initialized');
-        final currentUser = _auth.currentUser;
+        final currentUser = _auth?.currentUser;
         if (currentUser == null) throw Exception('No authenticated user');
 
         await _firestore!
