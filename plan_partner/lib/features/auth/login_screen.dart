@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import '../../core/providers/user_provider.dart';
 import '../../widgets/brand_app_icon.dart';
 
@@ -43,19 +44,31 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (!mounted) return;
       context.go('/home');
-    } catch (e) {
+    } on fb_auth.FirebaseAuthException catch (e) {
       if (!mounted) return;
       String errorMessage = 'Login failed';
-      if (e.toString().contains('user-not-found')) {
+      if (e.code == 'user-not-found') {
         errorMessage = 'User not found';
-      } else if (e.toString().contains('wrong-password')) {
+      } else if (e.code == 'wrong-password') {
         errorMessage = 'Wrong password';
-      } else if (e.toString().contains('invalid-email')) {
+      } else if (e.code == 'invalid-email') {
         errorMessage = 'Invalid email';
+      } else if (e.code == 'invalid-credential') {
+        errorMessage = 'Invalid email or password';
+      } else if (e.code == 'operation-not-allowed') {
+        errorMessage =
+            'Email/Password sign-in is disabled in Firebase Authentication';
+      } else {
+        errorMessage = 'Login failed (${e.code})';
       }
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(errorMessage)));
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Login failed')));
     } finally {
       if (mounted) {
         setState(() => _isSubmitting = false);

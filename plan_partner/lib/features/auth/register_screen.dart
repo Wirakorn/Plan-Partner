@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import '../../core/providers/user_provider.dart';
 import '../../widgets/brand_app_icon.dart';
 
@@ -60,19 +61,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
         context,
       ).showSnackBar(const SnackBar(content: Text('Registration successful')));
       context.go('/home');
-    } catch (e) {
+    } on fb_auth.FirebaseAuthException catch (e) {
       if (!mounted) return;
       String errorMessage = 'Registration failed';
-      if (e.toString().contains('email-already-in-use')) {
+      if (e.code == 'email-already-in-use') {
         errorMessage = 'Email already in use';
-      } else if (e.toString().contains('weak-password')) {
+      } else if (e.code == 'weak-password') {
         errorMessage = 'Password is too weak';
-      } else if (e.toString().contains('invalid-email')) {
+      } else if (e.code == 'invalid-email') {
         errorMessage = 'Invalid email';
+      } else if (e.code == 'operation-not-allowed') {
+        errorMessage =
+            'Email/Password sign-up is disabled in Firebase Authentication';
+      } else if (e.code == 'network-request-failed') {
+        errorMessage = 'Network error. Please check internet and try again';
+      } else {
+        errorMessage = 'Registration failed (${e.code})';
       }
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(errorMessage)));
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Registration failed')));
     } finally {
       if (mounted) {
         setState(() => _isSubmitting = false);
