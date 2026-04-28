@@ -18,10 +18,9 @@ jobs:
           channel: stable
           flutter-version: 3.41.1
       - name: Build Flutter Web
-        working-directory: plan_partner
         run: |
           flutter pub get
-          flutter build web
+          flutter build web --release
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PLAN_PARTNER_000 }}
