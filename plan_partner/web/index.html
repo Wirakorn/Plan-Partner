@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="plan_partner">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>plan_partner</title>
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <div id="app-error" style="display:none;position:fixed;inset:16px;z-index:9999;padding:12px 14px;border-radius:8px;background:#fff4f4;color:#8a1f1f;font-family:Arial,sans-serif;font-size:14px;line-height:1.4;border:1px solid #f0b7b7;"></div>
+  <script>
+    function showBootError(message) {
+      var box = document.getElementById('app-error');
+      if (!box) return;
+      box.style.display = 'block';
+      box.textContent = 'App failed to start: ' + message;
+    }
+
+    window.addEventListener('error', function (event) {
+      var msg = event.message || 'Unknown JavaScript error';
+      var src = event.filename
+        ? ' @ ' + event.filename + ':' + event.lineno + ':' + event.colno
+        : '';
+      var stack = event.error && event.error.stack ? '\n' + event.error.stack : '';
+      showBootError(msg + src + stack);
+    });
+
+    window.addEventListener('unhandledrejection', function (event) {
+      var reason = event.reason && event.reason.message
+        ? event.reason.message
+        : String(event.reason || 'Unknown Promise error');
+      var stack = event.reason && event.reason.stack ? '\n' + event.reason.stack : '';
+      showBootError('Unhandled promise rejection: ' + reason + stack);
+    });
+
+    setTimeout(function () {
+      var started = document.querySelector('flutter-view, flt-glass-pane');
+      if (!started) {
+        showBootError('Initialization timeout. Please hard refresh (Ctrl+F5).');
+      }
+    }, 8000);
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        for (const registration of registrations) {
+          registration.unregister();
+        }
+      });
+    }
+  </script>
+  <!--
+    You can customize the "flutter_bootstrap.js" script.
+    This is useful to provide a custom configuration to the Flutter loader
+    or to give the user feedback during the initialization process.
+
+    For more details:
+    * https://docs.flutter.dev/platform-integration/web/initialization
+  -->
+  <script src="flutter_bootstrap.js?v=20260304-1" async></script>
+</body>
+</html>
