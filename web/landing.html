@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Plan Partner landing page.">
+  <title>Plan Partner</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #04100e;
+      --bg-2: #071813;
+      --panel: rgba(9, 31, 27, 0.78);
+      --panel-strong: rgba(7, 24, 20, 0.92);
+      --panel-border: rgba(108, 219, 191, 0.16);
+      --text: #effbf8;
+      --muted: #b3d6cf;
+      --accent: #31d0b0;
+      --accent-2: #8cf5df;
+      --accent-3: #1ea58b;
+      --shadow: rgba(3, 12, 10, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100%;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(49, 208, 176, 0.24), transparent 30%),
+        radial-gradient(circle at bottom left, rgba(140, 245, 223, 0.14), transparent 28%),
+        linear-gradient(135deg, var(--bg) 0%, var(--bg-2) 46%, #0c221d 100%);
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      border-radius: 999px;
+      filter: blur(16px);
+      pointer-events: none;
+    }
+
+    body::before {
+      top: 6vh;
+      right: -90px;
+      width: 260px;
+      height: 260px;
+      background: rgba(49, 208, 176, 0.12);
+    }
+
+    body::after {
+      left: -70px;
+      bottom: 8vh;
+      width: 220px;
+      height: 220px;
+      background: rgba(140, 245, 223, 0.08);
+    }
+
+    .page {
+      position: relative;
+      overflow: hidden;
+      min-height: 100vh;
+    }
+
+    .wrap {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 72px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 56px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--accent), #188f78);
+      box-shadow: 0 16px 34px rgba(19, 160, 132, 0.28);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      flex: 0 0 auto;
+    }
+
+    .brand-mark img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Resize product preview images to avoid oversized screenshots */
+    .app-showcase .preview-card {
+      max-width: 260px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .app-showcase .preview-card img {
+      width: 220px;
+      height: auto;
+      max-height: 680px;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(3,12,10,0.35);
+      display: block;
+    }
+
+    @media (max-width: 720px) {
+      .app-showcase .preview-card img {
+        width: 100%;
+        max-height: 420px;
+      }
+      .app-showcase .preview-card {
+        max-width: 100%;
+      }
+    }
+
+    .brand-name {
+      font-size: 1.02rem;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+    }
+
+    .brand-tag {
+      font-size: 0.84rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav a,
+    .cta-link {
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .nav-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+      font-size: 0.94rem;
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+
+    .nav-pill:hover,
+    .cta-secondary:hover,
+    .cta-primary:hover {
+      transform: translateY(-1px);
+      border-color: rgba(140, 245, 223, 0.32);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      gap: 28px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(49, 208, 176, 0.09);
+      border: 1px solid rgba(140, 245, 223, 0.16);
+      color: #d3fbf3;
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+
+    .headline {
+      font-size: clamp(3rem, 7vw, 6rem);
+      line-height: 0.95;
+      letter-spacing: -0.06em;
+      margin: 0;
+      max-width: 10ch;
+    }
+
+    .headline span {
+      color: var(--accent-2);
+    }
+
+    .copy {
+      max-width: 60ch;
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: 1.06rem;
+      line-height: 1.85;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .cta-primary,
+    .cta-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 14px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+
+    .cta-primary {
+      background: linear-gradient(135deg, #1bd68a, #19a381);
+      color: #032319;
+      box-shadow: 0 16px 34px rgba(19, 160, 132, 0.24);
+    }
+
+    .cta-secondary {
+      border: 1px solid rgba(140, 245, 223, 0.16);
+      background: rgba(255, 255, 255, 0.04);
+      color: #daf6f0;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .hero-card {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 30px;
+      padding: 20px;
+      box-shadow: 0 28px 80px var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .hero-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .hero-card-title {
+      font-size: 1rem;
+      font-weight: 800;
+      margin: 0;
+    }
+
+    .hero-card-subtitle {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.94rem;
+      line-height: 1.6;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .stat {
+      padding: 16px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      min-height: 96px;
+    }
+
+    .stat strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 1.35rem;
+      color: var(--accent-2);
+    }
+
+    .stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    .visual-stack {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .preview-frame {
+      border-radius: 26px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015)),
+        radial-gradient(circle at 25% 18%, rgba(49, 208, 176, 0.16), transparent 25%),
+        rgba(5, 18, 15, 0.8);
+      border: 1px solid rgba(140, 245, 223, 0.14);
+      box-shadow: 0 24px 60px rgba(2, 9, 8, 0.45);
+      padding: 16px;
+    }
+
+    .frame-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .frame-bar span {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .preview-main {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .preview-main img,
+    .shot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .shot {
+      aspect-ratio: 4 / 5;
+      overflow: hidden;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .section {
+      margin-top: 24px;
+      padding: 28px;
+      border-radius: 28px;
+      background: var(--panel-strong);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 20px 60px rgba(2, 9, 8, 0.32);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: clamp(1.5rem, 2.6vw, 2.2rem);
+      letter-spacing: -0.03em;
+    }
+
+    .section-copy {
+      margin: 6px 0 0;
+      max-width: 62ch;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .feature-card {
+      padding: 18px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      min-height: 190px;
+    }
+
+    .feature-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      color: #06251d;
+      background: linear-gradient(135deg, #84f3dc, #30c8ae);
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .feature-card h3 {
+      margin: 0 0 8px;
+      font-size: 1.02rem;
+    }
+
+    .feature-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 0.95rem;
+    }
+
+    .process {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .step {
+      padding: 18px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .step-num {
+      display: inline-grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      margin-bottom: 12px;
+      border-radius: 999px;
+      background: rgba(140, 245, 223, 0.12);
+      color: #c8fbf0;
+      font-weight: 800;
+    }
+
+    .step h3 {
+      margin: 0 0 8px;
+      font-size: 1.02rem;
+    }
+
+    .step p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 0.95rem;
+    }
+
+    .screenshots {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .screenshot-card {
+      overflow: hidden;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .screenshot-media {
+      aspect-ratio: 9 / 13;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .screenshot-card .caption {
+      padding: 14px 16px 16px;
+    }
+
+    .caption strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 1rem;
+    }
+
+    .caption span {
+      display: block;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 0.92rem;
+    }
+
+    .cta-banner {
+      margin-top: 24px;
+      padding: 24px;
+      border-radius: 28px;
+      background:
+        linear-gradient(135deg, rgba(27, 214, 138, 0.16), rgba(30, 165, 139, 0.16)),
+        rgba(8, 24, 20, 0.9);
+      border: 1px solid rgba(140, 245, 223, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .cta-banner h2 {
+      margin: 0 0 8px;
+      font-size: 1.35rem;
+    }
+
+    .cta-banner p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 58ch;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: rgba(183, 225, 218, 0.72);
+      font-size: 0.92rem;
+      text-align: center;
+    }
+
+    @media (max-width: 1080px) {
+      .features {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .screenshots {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .preview-grid,
+      .process,
+      .stat-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .wrap {
+        width: min(100% - 20px, 1180px);
+        padding-top: 16px;
+      }
+
+      .topbar,
+      .section-head,
+      .cta-banner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .nav {
+        justify-content: flex-start;
+      }
+
+      .features,
+      .screenshots,
+      .process,
+      .preview-grid,
+      .stat-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section {
+        padding: 20px;
+      }
+
+      .headline {
+        max-width: 12ch;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="wrap">
+      <header class="topbar">
+        <a class="brand" href="#top" aria-label="Plan Partner landing page" id="top">
+          <span class="brand-mark">
+            <img src="icons/Icon-192.png" onerror="this.onerror=null;this.src='icons/Icon-192.png'" alt="Plan Partner logo">
+          </span>
+          <span>
+            <div class="brand-name">Plan Partner</div>
+            <div class="brand-tag">Task planning for focused teams</div>
+          </span>
+        </a>
+
+        <nav class="nav" aria-label="Landing navigation">
+          <a class="nav-pill" href="#features">Features</a>
+          <a class="nav-pill" href="#screenshots">Screenshots</a>
+          <a class="nav-pill" href="#how-it-works">How it works</a>
+          <a class="nav-pill" href="#about">About</a>
+        </nav>
+      </header>
+
+      <section class="hero">
+        <div>
+          <div class="eyebrow">Standalone marketing page for Plan Partner</div>
+          <h1 class="headline">Plan work with <span>clarity</span>.</h1>
+          <p class="copy">
+            Plan Partner helps individuals and teams organize tasks, prioritize what matters,
+            review progress, and keep the day moving with less friction. This landing page is
+            intentionally separate from the Flutter home page, so it can be opened on its own
+            URL as a real marketing entry point.
+          </p>
+
+          <div class="actions">
+            <a class="cta-primary cta-link" href="/login">Get started</a>
+            <a class="cta-primary cta-link" href="#features">Explore features</a>
+            <a class="cta-secondary cta-link" href="#screenshots">View app previews</a>
+          </div>
+
+          <div class="hero-meta">
+            <div class="pill">HTML landing page</div>
+            <div class="pill">Independent URL</div>
+            <div class="pill">Login opens separately</div>
+          </div>
+        </div>
+
+        <!-- Product snapshot removed as requested -->
+      </section>
+
+      <section class="section" id="features">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">What Plan Partner does</h2>
+            <p class="section-copy">
+              The app is built around the day-to-day flow of planning, checking, and finishing work.
+              These feature headings are the main story for the landing page.
+            </p>
+          </div>
+          <div class="pill">App feature</div>
+        </div>
+
+        <div class="features">
+          <article class="feature-card">
+            <div class="feature-icon">01</div>
+            <h3>Task tracking</h3>
+            <p>Create, edit, complete, and delete tasks in a clean flow that keeps daily planning fast and predictable.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">02</div>
+            <h3>Priority focus</h3>
+            <p>Highlight the most important work so urgent tasks stay visible and easier to act on first.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">03</div>
+            <h3>Progress review</h3>
+            <p>Check completed and pending items at a glance to understand momentum without digging through lists.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">04</div>
+            <h3>Chat with AI</h3>
+            <p>Use AI to rebalance the day, suggest next steps, and keep the plan realistic as priorities change.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="how-it-works">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">How the app fits into a day</h2>
+            <p class="section-copy">
+              A simple three-step flow makes the product story easy to understand for visitors.
+            </p>
+          </div>
+          <div class="pill">Marketing flow</div>
+        </div>
+
+        <div class="process">
+          <article class="step">
+            <div class="step-num">1</div>
+            <h3>Capture the work</h3>
+            <p>Add the tasks that matter today and keep them in one place instead of scattering them across notes.</p>
+          </article>
+          <article class="step">
+            <div class="step-num">2</div>
+            <h3>Rank the priority</h3>
+            <p>Sort by urgency, deadline, or effort so the team can focus on the right thing at the right time.</p>
+          </article>
+          <article class="step">
+            <div class="step-num">3</div>
+            <h3>Review the outcome</h3>
+            <p>Check what was completed, what is still open, and what should move into the next planning cycle.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="screenshots">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">App preview</h2>
+            <p class="section-copy">
+              Real screenshots from the app make the landing page feel grounded instead of placeholder-driven.
+            </p>
+          </div>
+          <div class="pill">Screenshots</div>
+        </div>
+
+        <div class="screenshots">
+          <article class="screenshot-card">
+            <div class="caption">
+              <strong>Daily task view</strong>
+              <span>A focused list for creating, reviewing, and finishing work quickly. (Image omitted)</span>
+            </div>
+          </article>
+          <article class="screenshot-card">
+            <div class="caption">
+              <strong>Priority planning</strong>
+              <span>Clearer organization for high-priority items and the next action. (Image omitted)</span>
+            </div>
+          </article>
+          <article class="screenshot-card">
+            <div class="caption">
+              <strong>Review and progress</strong>
+              <span>See the shape of the day and how work is moving forward. (Image omitted)</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="about">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">About the product</h2>
+            <p class="section-copy">
+              Plan Partner is meant to be a lightweight planning companion, not a cluttered dashboard.
+              The landing page mirrors that idea with a simple message, real product visuals, and direct feature stories.
+            </p>
+          </div>
+          <div class="pill">Brand story</div>
+        </div>
+
+        <div class="cta-banner">
+          <div>
+            <h2>Make the landing page the front door.</h2>
+            <p>
+              Visitors can land here directly, understand the app in a few seconds, and then decide whether to explore the Flutter app separately.
+              This keeps the marketing page and the home page independent by design.
+            </p>
+          </div>
+          <a class="cta-primary cta-link" href="#top">Back to top</a>
+        </div>
+      </section>
+
+      <div class="footer-note">
+        Standalone landing page for Plan Partner. Open it directly through <strong>/landing.html</strong>.
+      </div>
+    </div>
+  </main>
+</body>
+</html>
+</head>
+<body>
+  <main class="page">
+    <div class="wrap">
+      <header class="topbar">
+        <a class="brand" href="#top" aria-label="Plan Partner landing page">
+          <span class="brand-icon">
+            <img src="icons/Icon-192.png" onerror="this.onerror=null;this.src='icons/Icon-192.png'" alt="Plan Partner logo">
+          </span>
+          <span class="brand-copy">
+            <span class="brand-name">Plan Partner</span>
+            <span class="brand-tag">Task planning for people who need clarity fast</span>
+          </span>
+        </a>
+        <div class="pill">Standalone landing page</div>
+      </header>
+
+      <section class="hero" id="top">
+        <div>
+          <div class="eyebrow">Built for focused task management and quick daily planning</div>
+          <h1 class="headline">Plan work with <span>clarity</span>.</h1>
+          <p class="copy">
+            Plan Partner helps you organize tasks, prioritize what matters most, review progress,
+            and stay on top of the day without losing momentum. This landing page stays separate
+            from the Flutter home route and can be opened as its own public page.
+          </p>
+
+          <div class="meta-row">
+            <div class="pill">HTML only</div>
+            <div class="pill">Independent URL</div>
+            <div class="pill">No app routing dependency</div>
+            <div class="pill">Marketing-ready structure</div>
+          </div>
+
+          <div class="cta-row">
+            <a class="button primary" href="#features">Explore features</a>
+            <a class="button secondary" href="#screens">See screenshots</a>
+          </div>
+        </div>
+
+        <aside class="feature-panel">
+          <h2>What the app is for</h2>
+          <p>
+            A clean planning companion for daily task tracking, priority management, review,
+            and AI-guided adjustments when your schedule changes.
+          </p>
+
+          <div class="metric-grid">
+            <div class="metric">
+              <strong>Task</strong>
+              <span>Track, edit, complete, and delete tasks quickly.</span>
+            </div>
+            <div class="metric">
+              <strong>Priority</strong>
+              <span>Organize urgent work with deadline-aware planning.</span>
+            </div>
+            <div class="metric">
+              <strong>Review</strong>
+              <span>See progress with simple daily momentum signals.</span>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section" id="screens">
+        <div class="section-title">
+          <div>
+            <h2>Product preview</h2>
+            <p class="showcase-copy">
+              Use real screenshots here. The page already pulls the images from your Flutter assets,
+              so the landing feels like a proper product site instead of a placeholder.
+            </p>
+          </div>
+          <div class="pill">3 screenshot cards</div>
+        </div>
+
+        <div class="app-showcase">
+          <div class="preview-stack">
+            <div class="preview-grid">
+              <article class="preview-card">
+                <img src="../assets/images/preview_1.jpg" onerror="this.onerror=null;this.src='assets/images/preview_1.jpg'" alt="Plan Partner preview screen one">
+                <div class="preview-caption">
+                  <strong>Daily planning</strong>
+                  <span>Fast overview of tasks and what needs attention today.</span>
+                </div>
+              </article>
+              <article class="preview-card">
+                <img src="../assets/images/preview_2.jpg" onerror="this.onerror=null;this.src='assets/images/preview_2.jpg'" alt="Plan Partner preview screen two">
+                <div class="preview-caption">
+                  <strong>Task management</strong>
+                  <span>Handle creation, editing, and completion in a simple flow.</span>
+                </div>
+              </article>
+              <article class="preview-card">
+                <img src="../assets/images/preview_3.jpg" onerror="this.onerror=null;this.src='assets/images/preview_3.jpg'" alt="Plan Partner preview screen three">
+                <div class="preview-caption">
+                  <strong>Progress tracking</strong>
+                  <span>Review completed work and keep momentum visible.</span>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <div class="side-card">
+            <div class="side-card-inner">
+              <h3>Brand message</h3>
+              <p>
+                Plan Partner is a focused productivity app that turns planning into a quick daily
+                habit. It helps teams and solo users stay clear on what matters now.
+              </p>
+            </div>
+            <div class="side-card-inner">
+              <h3>Why this page works as marketing</h3>
+              <p>
+                It has a clear value proposition, product screenshots, feature highlights, and a
+                path that stays fully separate from your app shell.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="features">
+        <div class="section-title">
+          <div>
+            <h2>App features</h2>
+            <p>
+              These are the things the app actually helps with, phrased for users instead of just
+              internal function names.
+            </p>
+          </div>
+          <div class="pill">Task tracking + AI planning</div>
+        </div>
+
+        <div class="feature-grid">
+          <article class="card">
+            <div class="card-head">
+              <div class="icon-badge">1</div>
+              <h3>Task tracking</h3>
+            </div>
+            <p>Manage your daily to-dos in seconds with a simple flow that keeps the workload visible.</p>
+            <ul class="bullet-list">
+              <li>Create, edit, complete, and delete tasks quickly.</li>
+              <li>Keep your list clean without extra complexity.</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <div class="card-head">
+              <div class="icon-badge">2</div>
+              <h3>Priority focus</h3>
+            </div>
+            <p>Group tasks by importance and deadline so urgent work is easier to see first.</p>
+            <ul class="bullet-list">
+              <li>Separate urgent items from low-priority work.</li>
+              <li>Reduce last-minute rushes with clearer planning.</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <div class="card-head">
+              <div class="icon-badge">3</div>
+              <h3>Progress review</h3>
+            </div>
+            <p>See what was done, what is still open, and whether the day is moving forward.</p>
+            <ul class="bullet-list">
+              <li>Check completion status at a glance.</li>
+              <li>Use simple metrics to review momentum.</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <div class="card-head">
+              <div class="icon-badge">4</div>
+              <h3>Chat with AI</h3>
+            </div>
+            <p>Adapt your day when plans change and get practical next steps without starting over.</p>
+            <ul class="bullet-list">
+              <li>Rebalance priorities in real time.</li>
+              <li>Get suggestions that keep the schedule realistic.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-title">
+          <div>
+            <h2>How it fits a daily workflow</h2>
+            <p>
+              The app is built for a short loop: capture work, organize it, review the result, then
+              adjust the next day.
+            </p>
+          </div>
+        </div>
+
+        <div class="workflow">
+          <article class="step">
+            <div class="step-num">1</div>
+            <h3>Capture tasks</h3>
+            <p>Drop everything in quickly so nothing gets lost or forgotten.</p>
+          </article>
+          <article class="step">
+            <div class="step-num">2</div>
+            <h3>Prioritize work</h3>
+            <p>Sort by urgency and due date so the next action is obvious.</p>
+          </article>
+          <article class="step">
+            <div class="step-num">3</div>
+            <h3>Review and adapt</h3>
+            <p>Check progress, then update the plan with AI help when things change.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="contact-banner">
+        <div>
+          <h2 style="margin: 0; font-size: 1.35rem; letter-spacing: -0.03em;">Need a sharper product message?</h2>
+          <p>
+            I can turn this into a more premium SaaS-style landing page, add Thai copy, or wire it
+            to your real contact/deep-link endpoints.
+          </p>
+        </div>
+        <div class="cta-row" style="margin-top: 0;">
+          <a class="button primary" href="#top">Back to top</a>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <div class="footer-note">Plan Partner landing page stays separate from the Flutter home route.</div>
+        <div class="footer-links">
+          <a href="#features">Features</a>
+          <a href="#screens">Screens</a>
+          <a href="#top">Top</a>
+        </div>
+      </footer>
+    </div>
+  </main>
+
+  <script>
+    document.querySelectorAll('[data-asset]').forEach((element) => {
+      const assetName = element.getAttribute('data-asset');
+      if (!assetName) return;
+      element.src = new URL('../assets/images/' + assetName, document.baseURI).toString();
+    });
+  </script>
+</body>
+</html>
