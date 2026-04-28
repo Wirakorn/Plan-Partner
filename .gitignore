@@ -47,3 +47,12 @@ app.*.map.json
 # Android release signing (local only)
 /android/keystore.properties
 /android/app/upload-keystore.jks
+
+# Firebase
+.firebase/
+.firebaserc
+
+# Generated files (should be regenerated)
+**/generated_plugin_registrant.*
+**/GeneratedPluginRegistrant.*
+**/generated_plugins.cmake
