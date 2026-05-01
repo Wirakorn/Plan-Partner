@@ -12,6 +12,10 @@
         "destination": "/landing.html"
       },
       {
+        "source": "/Privacy Policy",
+        "destination": "/Privacy Policy.html"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
