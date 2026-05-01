@@ -12,10 +12,6 @@
         "destination": "/landing.html"
       },
       {
-        "source": "/Privacy Policy",
-        "destination": "/Privacy Policy.html"
-      },
-      {
         "source": "/privacy-policy",
         "destination": "/privacy-policy.html"
       },
